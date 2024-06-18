@@ -16,7 +16,7 @@ class GaussianNBClassifier:
         self._lr = lr
         self.num_samples = num_samples
         self._num_cls = None
-        self.consstrains = constrains
+        self.constrains = constrains
         self._c_logits = None        
         self._num_probs = None
         
@@ -77,7 +77,7 @@ class GaussianNBClassifier:
                 'sigma': pyro.param(
                     f'{col}_sigma',
                     lambda: torch.ones(self._num_cls),
-                    constraint=self.consstrains,
+                    constraint=self.constrains,
                 ),
             }
             for col in numerical_cols
