@@ -11,12 +11,12 @@ from tqdm.auto import tqdm
 
 
 class GaussianNBClassifier:
-    def __init__(self, num_epochs=500, lr=1e-2):
+    def __init__(self, num_epochs=500, lr=1e-2, num_samples=1, constrains=constraints.positive):
         self._num_epochs = num_epochs
         self._lr = lr
-        
+        self.num_samples = num_samples
         self._num_cls = None
-        
+        self.consstrains = constrains
         self._c_logits = None        
         self._num_probs = None
         
@@ -41,7 +41,7 @@ class GaussianNBClassifier:
         pred = pyro.infer.Predictive(
             model=self._model,
             guide=self._guide,
-            num_samples=1,
+            num_samples=self.num_samples,
             return_sites=('logP(c|x)',),
         )
         log_pcx = pred(X)['logP(c|x)'].detach().squeeze(0).squeeze(0)
@@ -77,7 +77,7 @@ class GaussianNBClassifier:
                 'sigma': pyro.param(
                     f'{col}_sigma',
                     lambda: torch.ones(self._num_cls),
-                    constraint=constraints.positive,
+                    constraint=self.consstrains,
                 ),
             }
             for col in numerical_cols
